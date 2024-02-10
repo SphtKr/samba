@@ -2,7 +2,7 @@
 [ -z "$DOCKER_REGISTRY" ] && echo "error please specify docker-registry DOCKER_REGISTRY" && exit 1
 IMG="$DOCKER_REGISTRY/samba"
 
-PLATFORM="linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
+PLATFORM="linux/amd64,linux/arm64/v8,linux/arm/v7"
 
 rm -rf variants.tar variants/ 2>/dev/null >/dev/null
 

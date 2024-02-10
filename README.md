@@ -1,6 +1,6 @@
 # samba - (ghcr.io/servercontainers/samba) [x86 + arm]
 
-samba on alpine
+Samba on Ubuntu with TimeMachine, zeroconf (`avahi`) and WSD (Web Services for Devices) (`wsdd2`) support
 
 with timemachine, zeroconf (`avahi`) and WSD (Web Services for Devices) (`wsdd2`) support.
 
