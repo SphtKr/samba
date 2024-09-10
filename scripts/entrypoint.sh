@@ -31,7 +31,7 @@ if [ ! -f "$INITALIZED" ]; then
   echo ">> CONTAINER: starting initialisation"
 
   cp /container/config/samba/smb.conf /etc/samba/smb.conf
-  cp /container/config/avahi/samba.service /etc/avahi/services/samba.service
+  cp /container/config/avahi/samba.service /etc/avahi/services/samba.service  
 
   ##
   # MAIN CONFIGURATION
@@ -88,6 +88,28 @@ if [ ! -f "$INITALIZED" ]; then
     echo ">> global config - adding: '$CONF_KEY_VALUE' = '$CONF_CONF_VALUE' to /etc/samba/smb.conf"
     echo '   '"$CONF_KEY_VALUE"' = '"$CONF_CONF_VALUE"  >> /etc/samba/smb.conf
   done
+
+  ##
+  # DOMAIN CONFIGURATION
+  ##
+  if [ ! -z ${SAMBA_JOIN_DOMAIN+x} ]
+  then
+    sed -i 's$security = user$security = ADS$g' /etc/samba/smb.conf
+    echo '   winbind use default domain = yes' >> /etc/samba/smb.conf
+    echo '   winbind nss info = template' >> /etc/samba/smb.conf
+    cat << EOF > /etc/krb5.conf
+[libdefaults]
+	default_realm = ${SAMBA_JOIN_DOMAIN}
+	dns_lookup_realm = false
+	dns_lookup_kdc = true
+EOF
+    export PASSWD=${SAMBA_JOIN_PASSWD}
+    net ads join -U ${SAMBA_JOIN_USER}
+    sed -i 's/^passwd:\(.*\)/passwd:\1 winbind/' /etc/nsswitch.conf
+    sed -i 's/^group:\(.*\)/group:\1 winbind/' /etc/nsswitch.conf
+
+  else
+  ### IF NOT JOINING DOMAIN...
 
   ##
   # Create GROUPS
@@ -154,6 +176,9 @@ EOF
 
     unset $(echo "$I_ACCOUNT" | cut -d'=' -f1)
   done
+
+  ### ...IF NOT JOINING DOMAIN
+  fi
 
   echo '' >> /etc/samba/smb.conf
 
