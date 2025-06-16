@@ -89,6 +89,9 @@ if [ ! -f "$INITALIZED" ]; then
     echo '   '"$CONF_KEY_VALUE"' = '"$CONF_CONF_VALUE"  >> /etc/samba/smb.conf
   done
 
+  # FAIL FAST START
+  [ ! -z ${FAIL_FAST+x} ] && set -e
+
   ##
   # Create GROUPS
   ##
@@ -154,6 +157,10 @@ EOF
 
     unset $(echo "$I_ACCOUNT" | cut -d'=' -f1)
   done
+
+  [ ! -z ${FAIL_FAST+x} ] && set +e
+  # FAIL FAST END
+
 
   echo '' >> /etc/samba/smb.conf
 
@@ -257,6 +264,7 @@ EOF
   done
 
   [ ! -z ${AVAHI_NAME+x} ] && echo ">> ZEROCONF: custom avahi samba.service name: $AVAHI_NAME" && sed -i 's/%h/'"$AVAHI_NAME"'/g' /etc/avahi/services/samba.service
+  [ ! -z ${AVAHI_NAME+x} ] && echo ">> ZEROCONF: custom avahi avahi-daemon.conf host-name: $AVAHI_NAME" && sed -i "s/#host-name=foo/host-name=${AVAHI_NAME}/" /etc/avahi/avahi-daemon.conf
 
   echo ">> ZEROCONF: samba.service file"
   echo "############################### START ####################################"
