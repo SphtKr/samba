@@ -111,8 +111,9 @@ EOF
     sed -i 's/^passwd:\(.*\)/passwd:\1 winbind/' /etc/nsswitch.conf
     sed -i 's/^group:\(.*\)/group:\1 winbind/' /etc/nsswitch.conf
 
-  else
-  ### IF NOT JOINING DOMAIN...
+  fi
+  ### Even if joining a domain, allow creation of non-domain users and groups,
+  ### useful for e.g. share-only service accounts (scanner senders, etc.)
 
   ##
   # Create GROUPS
@@ -179,9 +180,6 @@ EOF
 
     unset $(echo "$I_ACCOUNT" | cut -d'=' -f1)
   done
-
-  ### ...IF NOT JOINING DOMAIN
-  fi
   
   [ ! -z ${FAIL_FAST+x} ] && set +e
   # FAIL FAST END
